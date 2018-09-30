@@ -1,0 +1,60 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @File  : Dijkstra self.py
+# @Author: Icefrozenbite
+# @Date  : 2018/9/28
+# @Desc  : 
+#@Contact : gongez@qq.com
+
+'''
+First let's create a graph and store the data in a dictionary form
+'''
+
+graph = {'a':{'b':7,'c':9,'f':14},'b':{'c':10,'d':15},'c':{'f':2,'d':11},'d':{'e':6},'e':{},'f':{'e':9}}
+
+known_distances = {'a':99999,'b':99999,'c':99999,'d':99999,'e':99999,'f':99999} #This dictionary represents the distance between a certain node to a specific node. Distance of 99999 means that we don't know the shortest distance to a certain node yet, so we set it to infinity
+
+
+'''
+To formalize the graph
+'''
+
+graph_keys = graph.keys()
+
+for key in graph:
+    graph_sub_keys = graph[key].keys()
+    for key_add in graph_keys:
+        if key_add != key:
+            if key_add not in graph_sub_keys:
+                graph[key].update({key_add:99999})
+
+print(graph)
+
+#I want to graph to be in such a format that the distance between two unconnected nodes is set to be 99999, so that I dont need to do extra changes to the graph due to miscellaneous differences
+
+'''
+To run the dijkstra
+'''
+
+
+def dijkstra(graph, start, goal):
+    the_next_node = start #To free myself from setting the starting point as a special case and writing exccessive codes
+    the_next_node_distance = 0 #We don't yet know what the next node may be, so of course we don't yet know the distance between the starting node to its next node
+    
+    '''
+    Let the path-finding loop begin!
+    '''
+    
+    while the_next_node != goal: #If we've already had the_next_node as the goal, we can simply read its paired value (distance) from known_distances, and our job is thus done!
+        del known_distances[the_next_node] #A node shall not lead to itself. I don't set the distance to be 0 because it interferes with the 'nearest-node-finding' mechanism later
+        for known_distances_key in known_distances: #Trying to update the already known distances from one node to another. If the path from node A to node B then to node C is shorter than the one from A directly to C, then the distance between A and C should be updated  
+            if known_distances[known_distances_key] > (graph[the_next_node][known_distances_key] + the_next_node_distance):
+                known_distances[known_distances_key] = (graph[the_next_node][known_distances_key] + the_next_node_distance) 
+        the_next_node_distance = min(known_distances.values()) #Then lets see which node is the closest node according to the updated information
+        for known_distances_key in known_distances: #This is for finding the nearest node
+            if the_next_node_distance == known_distances[known_distances_key]:
+                the_next_node = known_distances_key
+    print('The shortest distance from start to goal is:',known_distances[goal])
+    
+    
+dijkstra(graph,'a','e')
